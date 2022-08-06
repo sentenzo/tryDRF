@@ -20,6 +20,24 @@ class WordSerializer(serializers.Serializer):
     updated_at = serializers.DateTimeField(read_only=True)
     language_id = serializers.IntegerField()
 
+    def create(self, validated_data):
+        return Word.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        # return super().update(instance, validated_data)
+        instance.spelling = validated_data.get("spelling", instance.spelling)
+        instance.ipa_transcription = validated_data.get(
+            "ipa_transcription", instance.ipa_transcription
+        )
+        instance.definition = validated_data.get("definition", instance.definition)
+        instance.created_at = validated_data.get("created_at", instance.created_at)
+        instance.updated_at = validated_data.get("updated_at", instance.updated_at)
+        instance.language_id = validated_data.get("language_id", instance.language_id)
+
+        instance.save()
+
+        return instance
+
 
 # def encode():
 #     model = WordModel("123456", "table is a table")

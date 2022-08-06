@@ -21,4 +21,5 @@ from thesaurus.views import WordsApiView
 urlpatterns = [
     path("MgUcajIf8GNJV937YwFa/admin/", admin.site.urls),
     path("api/v1/wordlist", WordsApiView.as_view()),
+    path("api/v1/wordlist/<int:pk>/", WordsApiView.as_view()),
 ]

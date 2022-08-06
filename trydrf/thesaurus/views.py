@@ -13,24 +13,42 @@ class WordsApiView(APIView):
         words = Word.objects.all().values()
         return Response({"words": WordSerializer(words, many=True).data})
 
-    def post(lf, request):
-        langs = {"en": "English", "ru": "Русский"}
-
+    def post(self, request):
         serializer = WordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        serializer.save()
 
-        # fmt: off
-        new_word = Word.objects.create(
-            spelling= request.data['spelling'],  # "apple", 
-            ipa_transcription = request.data['ipa_transcription'],
-            definition = request.data['definition'],
-            language = Language.objects.get(
-                name=langs[request.data["language_code"]]
-            ),
-        )
-        # fmt: on
+        return Response({"word": serializer.data})
 
-        return Response({"word": WordSerializer(new_word).data})
+    def put(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        if not pk:
+            return Response({"error": "pk field is required"})
+
+        try:
+            instance = Word.objects.get(pk=pk)
+        except:
+            return Response({"error": f"Feild to find the object (pk={pk}"})
+
+        serializer = WordSerializer(data=request.data, instance=instance)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response({"word": serializer.data})
+
+    def delete(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        if not pk:
+            return Response({"error": "pk field is required"})
+
+        try:
+            instance = Word.objects.get(pk=pk)
+        except Exception as ex:
+            return Response({"error": f"Feild to find the object (pk={pk})"})
+
+        instance.delete()
+
+        return Response({"word": f"deleted post (pk={pk})"})
 
 
 # class WordsApiView(generics.ListAPIView):
