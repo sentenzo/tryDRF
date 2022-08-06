@@ -11,10 +11,14 @@ from .serializers import WordSerializer
 class WordsApiView(APIView):
     def get(self, request):
         words = Word.objects.all().values()
-        return Response({"words": words})
+        return Response({"words": WordSerializer(words, many=True).data})
 
     def post(lf, request):
         langs = {"en": "English", "ru": "Русский"}
+
+        serializer = WordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
         # fmt: off
         new_word = Word.objects.create(
             spelling= request.data['spelling'],  # "apple", 
@@ -26,7 +30,7 @@ class WordsApiView(APIView):
         )
         # fmt: on
 
-        return Response({"word": model_to_dict(new_word)})
+        return Response({"word": WordSerializer(new_word).data})
 
 
 # class WordsApiView(generics.ListAPIView):
